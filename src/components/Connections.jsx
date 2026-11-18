@@ -28,6 +28,7 @@ const Connections = () => {
     <>
       <h1 className="font-bold text-3xl text-center my-4">Connections</h1>
       <div className="flex gap-6 justify-center">
+        {connections?.length === 0 ? <p>No connections found</p> : ""}
         {connections &&
           connections.map((connection) => {
             const { _id, firstName, lastName, gender, age, photoUrl, about } =

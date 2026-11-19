@@ -7,10 +7,10 @@ import { addFeed } from "../utils/feedSlice";
 
 const Feed = () => {
   const dispatch = useDispatch();
-  const feed = useSelector((store) => store.feed);
+  const feeds = useSelector((store) => store.feed);
 
   const fetchFeed = async () => {
-    if (feed) return;
+    if (feeds) return;
     try {
       const res = await axios.get(`${BASE_URL}/feed`, {
         withCredentials: true,
@@ -27,7 +27,7 @@ const Feed = () => {
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-132px)] my-6">
-      {feed && <UserCard feed={feed[0]} />}
+      {!feeds?.length ? <p>No user found</p> : <UserCard feed={feeds[0]} />}
     </div>
   );
 };

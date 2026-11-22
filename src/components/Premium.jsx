@@ -1,19 +1,31 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Premium = () => {
   const [isPremium, setIsPremium] = useState(false);
 
-  const verfiyPremiumUser = async () => {
-    const res = await axios.get(`${BASE_URL}/payment/verify`, {
-      withCredentials: true,
-    });
+  const verifyPremiumUser = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/payment/verify`, {
+        withCredentials: true,
+      });
 
-    if (res.data.isPremium) {
-      setIsPremium(true);
+      if (res.data.isPremium) {
+        setIsPremium(res.data.isPremium);
+      }
+    } catch (error) {
+      console.error("Error verifying premium user:", error);
     }
   };
+
+  useEffect(() => {
+    const verifyOnMount = async () => {
+      await verifyPremiumUser();
+    };
+
+    verifyOnMount();
+  }, []);
 
   const handleBuyClick = async (type) => {
     try {
@@ -42,18 +54,20 @@ const Premium = () => {
         theme: {
           color: "#3399cc",
         },
-        handler: verfiyPremiumUser,
+        handler: verifyPremiumUser,
       };
       const rzp1 = new window.Razorpay(options);
-      // rzp1.on("payment.failed", function (response) {
-      //   alert(response.error.code);
-      //   alert(response.error.description);
-      //   alert(response.error.source);
-      //   alert(response.error.step);
-      //   alert(response.error.reason);
-      //   alert(response.error.metadata.order_id);
-      //   alert(response.error.metadata.payment_id);
-      // });
+      rzp1.on("payment.failed", function (response) {
+        console.error("Payment failed:", {
+          code: response.error.code,
+          description: response.error.description,
+          source: response.error.source,
+          step: response.error.step,
+          reason: response.error.reason,
+          order_id: response.error.metadata.order_id,
+          payment_id: response.error.metadata.payment_id,
+        });
+      });
       rzp1.open();
     } catch (error) {
       console.log(error);
